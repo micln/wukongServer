@@ -7,15 +7,10 @@ import (
 )
 
 var (
-	wk *wukong.Wukong
+	wk *wukong.Wukong = wukong.DefaultEngine()
 )
 
 func init() {
-	wk = wukong.NewWukong()
-
-	//wk.AddIndexDocument(`此次百度收购将成中国互联网最大并购`)
-	//wk.AddIndexDocument(`百度宣布拟全资收购91无线业务`)
-	//wk.AddIndexDocument(`百度是中国最大的搜索引擎`)
 }
 
 type WukongController struct {
@@ -37,7 +32,8 @@ func (wc *WukongController) Document() {
 			return
 		}
 
-		doc, err := wk.AddIndexDocument(content)
+		doc := models.Document{Content: content}
+		err := wk.AddIndexDocument(&doc)
 		if err == nil {
 			wc.AjaxSuccess(doc)
 		} else {

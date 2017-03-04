@@ -3,6 +3,7 @@ package wukong
 import (
 	"wukongServer/models"
 
+	"github.com/astaxie/beego"
 	"github.com/huichen/wukong/engine"
 	"github.com/huichen/wukong/types"
 	. "github.com/micln/go-utils"
@@ -19,6 +20,14 @@ var (
 	wukong *Wukong
 )
 
+func init() {
+	wukong = NewWukong()
+}
+
+func DefaultEngine() *Wukong {
+	return wukong
+}
+
 func NewWukong() *Wukong {
 	wk := &Wukong{
 		Engine:    engine.Engine{},
@@ -26,7 +35,7 @@ func NewWukong() *Wukong {
 	}
 
 	wk.Engine.Init(types.EngineInitOptions{
-		SegmenterDictionaries: "dictionary.simple.txt",
+		SegmenterDictionaries: beego.AppConfig.String("wukong::SegmenterDictionaries"),
 	})
 
 	//	load from db
@@ -43,13 +52,7 @@ func NewWukong() *Wukong {
 	return wk
 }
 
-func init() {
-	//wukong = NewWukong()
-}
-
-func (wk *Wukong) AddIndexDocument(document string) (doc *models.Document, err error) {
-
-	doc = &models.Document{Content: document}
+func (wk *Wukong) AddIndexDocument(doc *models.Document) (err error) {
 
 	err = doc.Save()
 	if err != nil {
@@ -57,10 +60,10 @@ func (wk *Wukong) AddIndexDocument(document string) (doc *models.Document, err e
 	}
 
 	docId := doc.Id
-	wk.documents[docId] = document
+	wk.documents[docId] = doc.Content
 
 	wk.IndexDocument(docId, types.DocumentIndexData{
-		Content: document,
+		Content: doc.Content,
 	}, false)
 
 	go wk.FlushIndex()
@@ -77,12 +80,12 @@ func (wk *Wukong) SearchText(text string) SearchResults {
 
 	results := SearchResults{
 		SearchResponse: wk.Search(types.SearchRequest{Text: text}),
-		Documents:      make(map[uint64]string),
+		Documents:      make(map[uint64]*models.Document),
 	}
 
 	for idx := range results.Docs {
 		docId := results.Docs[idx].DocId
-		results.Documents[docId] = wk.documents[docId]
+		results.Documents[docId] = models.Document{Id: docId}.First()
 	}
 
 	return results

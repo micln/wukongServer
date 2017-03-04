@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>[{{ .searchRequest.kw }}]的搜索结果</title>
+</head>
+<body>
+<form action="">
+    <input type="text" name="kw" value="{{ .searchRequest.kw }}">
+    <input type="submit">
+</form>
+<p>
+    关键词：{{ range $tag :=  .searchResult.SearchResponse.Tokens }}
+        <span>{{ $tag }}</span>
+    {{ end }}
+</p>
+<hr>
+{{ range $id, $doc := .searchResult.Documents }}
+    <div id="s-q-{{ $id }}">
+        <p>
+            <a href="{{ $doc.Url }}">{{ $doc.Title }}</a>
+            <small>{{ $doc.Keywords }} </small>
+        </p>
+        <p>{{ $doc.Content }}</p>
+    </div>
+{{ end }}
+</body>
+</html>

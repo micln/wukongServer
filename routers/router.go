@@ -16,6 +16,7 @@ import (
 func init() {
 
 	beego.AutoRouter(&controllers.WukongController{})
+	beego.AutoRouter(&controllers.PageController{})
 
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/object",

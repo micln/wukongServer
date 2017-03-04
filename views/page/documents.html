@@ -1,0 +1,27 @@
+<html>
+<head>
+<title> 所有文档</title>
+</head>
+<body>
+
+<div>
+<p>手动添加文档：</p>
+<form action="/page/document" method="post">
+    <input type="text" name="title" placeholder="标题">
+    <br>
+    <textarea name="content" id="" cols="120" rows="3" placeholder="正文"></textarea>
+    <br>
+    <input type="text" name="url" placeholder="相关链接">
+    <br>
+    <input type="submit">
+</form>
+</div>
+
+<hr>
+{{ range $idx, $doc := .documents }}
+    <div id="doc-{{ $idx }}">
+        {{ $doc }}
+    </div>
+{{ end }}
+</body>
+</html>
